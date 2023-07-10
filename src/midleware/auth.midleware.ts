@@ -5,6 +5,8 @@ import { Request, Response, NextFunction } from 'express';
 export class AuthMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     const token = req.headers.authorization?.slice(7);
+    console.log(token);
+    console.log(req.cookies.jwt);
 
     if (token !== req.cookies.jwt) {
       res.status(401).json({ message: 'Invalid token' });

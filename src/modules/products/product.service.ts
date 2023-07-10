@@ -15,6 +15,13 @@ export class ProductService {
     return this.productRepository.find();
   }
 
+  async getProductId(productId: number): Promise<Product> {
+    const product = await this.productRepository.findOneBy({
+      id: productId,
+    });
+    return product;
+  }
+
   createProduct(data: Product): Promise<Product> {
     return this.productRepository.save(data);
   }
@@ -44,9 +51,10 @@ export class ProductService {
       );
     }
 
-    // Cập nhật thông tin sản phẩm
-    Object.assign(product, updatedProduct);
-    const updatedProductEntity = await this.productRepository.save(product);
+    const updatedProductEntity = await this.productRepository.save({
+      ...product,
+      ...updatedProduct,
+    });
 
     return updatedProductEntity;
   }

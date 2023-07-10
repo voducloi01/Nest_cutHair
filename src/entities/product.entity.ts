@@ -22,6 +22,12 @@ export class ProductEntity extends BaseEntity {
   @Column()
   categoryId: number;
 
+  @Column()
+  urlImg: string;
+
+  @Column()
+  nameImg: string;
+
   @ManyToOne(() => CategoriesEntity, (category) => category.products)
   @JoinColumn({ name: 'categoryId', referencedColumnName: 'id' })
   category: CategoriesEntity;
