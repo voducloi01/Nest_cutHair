@@ -4,7 +4,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  JoinColumn,
 } from 'typeorm';
 import { ProductEntity } from './product.entity';
 
