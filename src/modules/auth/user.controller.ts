@@ -16,6 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Response, Request } from 'express';
 import { userDTO } from 'src/dto/user.dto';
 import { AuthMiddleware } from '../../midleware/auth.midleware';
+import { LoginDto } from 'src/dto/login.dto';
 
 @UseGuards(AuthMiddleware)
 @Controller('users')
@@ -41,7 +42,7 @@ export class UserController {
 
   @Post('login')
   async login(
-    @Body(new ValidationPipe()) body: any,
+    @Body(new ValidationPipe()) body: LoginDto,
     @Res({ passthrough: true }) response: Response,
   ) {
     const { email, password } = body;
