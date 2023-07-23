@@ -4,6 +4,7 @@ import { OrderCutEntity } from 'src/entities/orderCut.entity';
 import { Repository } from 'typeorm';
 import { OrderCutDto } from 'src/dto/orderCut.dto';
 import * as nodemailer from 'nodemailer';
+import moment from 'moment-timezone';
 
 @Injectable()
 export class OrderService {
@@ -27,7 +28,32 @@ export class OrderService {
     return order;
   }
 
+  async checkDuplicateDate(requestDate: Date) {
+    try {
+      const existingOrder = await this.orderRepository.findOne({
+        where: {
+          dateSchedule: requestDate,
+        },
+      });
+      return existingOrder;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async createOrder(data: OrderCutDto): Promise<OrderCutEntity> {
+    const currentDate = new Date();
+    const requestDate = new Date(data.dateSchedule);
+    const ExitDuplicateOrder = await this.checkDuplicateDate(requestDate);
+
+    if (ExitDuplicateOrder) {
+      throw new Error('Ngày bị trùng!');
+    }
+
+    if (requestDate < currentDate) {
+      throw new Error('Không thể tạo đơn hàng cho ngày tháng năm quá khứ.');
+    }
+
     try {
       await this.sendMail(data);
       return await this.orderRepository.save(data);
@@ -43,7 +69,7 @@ export class OrderService {
         from: 'ducloi.hutech@gmail.com',
         subject: 'Đơn đặt',
         text: 'Well come',
-        html: `<b>Đơn đặt lich giờ ${data.hour} ngày ${data.dateSchedule} của bạn thành công !</b>`,
+        html: `<b>Đơn đặt lich ngày ${data.dateSchedule} của bạn thành công !</b>`,
       });
     } catch (err) {
       console.error(err);

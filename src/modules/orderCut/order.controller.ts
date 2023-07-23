@@ -17,6 +17,8 @@ export class OrderCotroller {
         HttpMessage.SUCCESS,
       );
     } catch (error) {
+      console.log(error);
+
       return new ResponseData<OrderModel>(
         null,
         HttpStatus.ERROR,
@@ -36,6 +38,8 @@ export class OrderCotroller {
         HttpMessage.SUCCESS,
       );
     } catch (error) {
+      console.log(error);
+
       return new ResponseData<OrderModel>(
         null,
         HttpStatus.ERROR,

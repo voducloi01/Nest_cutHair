@@ -1,10 +1,4 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsNotEmpty,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 
 export class OrderCutDto {
   @IsNotEmpty()
@@ -20,9 +14,6 @@ export class OrderCutDto {
   @MinLength(10)
   @MaxLength(15)
   phone: number;
-
-  @IsNotEmpty()
-  hour: string;
 
   @IsNotEmpty()
   dateSchedule: Date;

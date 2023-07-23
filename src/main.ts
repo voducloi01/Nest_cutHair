@@ -8,6 +8,7 @@ import { config } from 'dotenv';
 config();
 import { v2 as cloudinary } from 'cloudinary';
 import './config/cloudinary.config';
+import * as cors from 'cors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +28,14 @@ async function bootstrap() {
     api_key: apiKey,
     api_secret: apiSecret,
   });
+  const corsOptions = {
+    origin: '*',
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+  };
+
+  app.use(cors(corsOptions));
+
   await app.listen(3000);
 
   if (module.hot) {

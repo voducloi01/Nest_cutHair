@@ -14,9 +14,6 @@ export class OrderCutEntity extends BaseEntity {
   @Column()
   phone: number;
 
-  @Column()
-  hour: string;
-
-  @Column({ type: 'date' })
+  @Column({ type: 'datetime' })
   dateSchedule: Date;
 }
