@@ -3,7 +3,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
+  Put,
   Req,
   Res,
   UnauthorizedException,
@@ -17,6 +19,7 @@ import { Response, Request } from 'express';
 import { userDTO } from 'src/dto/user.dto';
 import { AuthMiddleware } from '../../midleware/auth.midleware';
 import { LoginDto } from 'src/dto/login.dto';
+import { Category } from 'src/models/category.model';
 
 @UseGuards(AuthMiddleware)
 @Controller('users')
@@ -92,5 +95,18 @@ export class UserController {
     return {
       message: 'success',
     };
+  }
+
+  @Put('/update/:id')
+  async updateUser(
+    @Param('id') id: number,
+    @Body(new ValidationPipe()) body: Partial<userDTO>,
+  ) {
+    try {
+      const user = await this.UserService.updateUser(id, body);
+      return { data: user, status: 201 };
+    } catch (error) {
+      return { data: error, status: 400 };
+    }
   }
 }

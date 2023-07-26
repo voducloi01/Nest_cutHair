@@ -43,7 +43,6 @@ export class ProductService {
     productId: number,
     updatedProduct: Partial<Product>,
   ): Promise<Product> {
-    // Kiểm tra sự tồn tại của sản phẩm với ID tương ứng
     const product = await this.productRepository.findOneBy({ id: productId });
     if (!product) {
       throw new NotFoundException(
