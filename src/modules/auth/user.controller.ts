@@ -100,7 +100,7 @@ export class UserController {
   @Put('/update/:id')
   async updateUser(
     @Param('id') id: number,
-    @Body(new ValidationPipe()) body: Partial<userDTO>,
+    @Body(new ValidationPipe()) body: userDTO,
   ) {
     try {
       const user = await this.UserService.updateUser(id, body);

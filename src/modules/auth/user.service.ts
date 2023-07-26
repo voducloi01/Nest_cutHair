@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { userDTO } from 'src/dto/user.dto';
 import { UserEntity } from 'src/entities/user.entity';
 import { ROLE } from 'src/until/constans';
 import { IFUser } from 'src/until/interface';
@@ -20,7 +21,7 @@ export class userService {
     return this.userRepository.findOne({ where: data });
   }
 
-  async updateUser(id: number, data: Partial<IFUser>) {
+  async updateUser(id: number, data: userDTO) {
     // Kiểm tra sự tồn tại của sản phẩm với ID tương ứng
     const user = await this.userRepository.findOneBy({ id: id });
 
@@ -28,8 +29,10 @@ export class userService {
       throw new NotFoundException(`Không tìm thấy User với ID ${id}`);
     }
 
-    if (data.role !== ROLE.Admin && data.role !== ROLE.Staff) {
-      throw new NotFoundException('Role is not exits!');
+    if (data.role) {
+      if (data.role !== ROLE.Admin && data.role !== ROLE.Staff) {
+        throw new NotFoundException('Role is not exits!');
+      }
     }
 
     const updateUser = await this.userRepository.save({

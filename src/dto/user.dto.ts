@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class userDTO {
   @IsString()
@@ -12,4 +18,8 @@ export class userDTO {
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @IsNumber()
+  @IsOptional() // Sử dụng @IsOptional để cho phép trường này không bắt buộc
+  role?: number;
 }
