@@ -19,7 +19,10 @@ import { Response, Request } from 'express';
 import { userDTO } from 'src/dto/user.dto';
 import { AuthMiddleware } from '../../midleware/auth.midleware';
 import { LoginDto } from 'src/dto/login.dto';
-import { Category } from 'src/models/category.model';
+import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
+import { User } from 'src/models/user.model';
+import { ResponseData } from 'src/global/globalClass';
+import { ResponseType } from 'src/global/globalType';
 
 @UseGuards(AuthMiddleware)
 @Controller('users')
@@ -30,45 +33,65 @@ export class UserController {
   ) {}
 
   @Post('register')
-  async register(@Body(new ValidationPipe()) UserDto: userDTO) {
+  async register(
+    @Body() UserDto: userDTO,
+    @Res() res: Response,
+  ): Promise<ResponseType<User>> {
     const { name, email, password } = UserDto;
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = this.UserService.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
+    try {
+      const userCopy = this.UserService.create({
+        name,
+        email,
+        password: hashedPassword,
+      });
+      delete (await userCopy).password;
 
-    delete (await user).password;
-    return user;
+      return res.json(
+        new ResponseData(userCopy, HttpStatus.SUCCESS, HttpMessage.SUCCESS),
+      );
+    } catch (error) {
+      return res.json(
+        new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR),
+      );
+    }
   }
 
   @Post('login')
   async login(
     @Body(new ValidationPipe()) body: LoginDto,
     @Res({ passthrough: true }) response: Response,
-  ) {
-    const { email, password } = body;
-    const user = await this.UserService.findUser({ email });
+  ): Promise<ResponseType<User>> {
+    try {
+      const { email, password } = body;
+      const user = await this.UserService.findUser({ email });
 
-    if (!user) {
-      throw new BadRequestException('Is not email');
+      if (!user) {
+        throw new BadRequestException('duplicate mail!q');
+      }
+
+      if (!(await bcrypt.compare(password, user.password))) {
+        throw new BadRequestException('Password sai !');
+      }
+
+      const jwt = await this.jwtService.signAsync({ id: user.id });
+      response.cookie('jwt', jwt, { httpOnly: true });
+      return response.json(
+        new ResponseData(
+          { token: jwt },
+          HttpStatus.SUCCESS,
+          HttpMessage.SUCCESS,
+        ),
+      );
+    } catch (error) {
+      return response.json(
+        new ResponseData(error, HttpStatus.SUCCESS, HttpMessage.SUCCESS),
+      );
     }
-
-    if (!(await bcrypt.compare(password, user.password))) {
-      throw new BadRequestException('Is not password');
-    }
-
-    const jwt = await this.jwtService.signAsync({ id: user.id });
-    response.cookie('jwt', jwt, { httpOnly: true });
-    return {
-      status: 'success',
-      data: { token: jwt },
-    };
   }
 
   @Get('user')
-  async user(@Req() request: Request) {
+  async user(@Req() request: Request): Promise<ResponseType<User>> {
     try {
       const cookie = request.cookies['jwt'];
 
@@ -82,9 +105,9 @@ export class UserController {
 
       const { password, ...result } = user;
 
-      return result;
+      return new ResponseData(result, HttpStatus.SUCCESS, HttpMessage.SUCCESS);
     } catch (e) {
-      throw new UnauthorizedException();
+      return new ResponseData(e, HttpStatus.ERROR, HttpMessage.ERROR);
     }
   }
 
@@ -96,17 +119,16 @@ export class UserController {
       message: 'success',
     };
   }
-
   @Put('/update/:id')
   async updateUser(
     @Param('id') id: number,
     @Body(new ValidationPipe()) body: userDTO,
-  ) {
+  ): Promise<ResponseType<User>> {
     try {
       const user = await this.UserService.updateUser(id, body);
-      return { data: user, status: 201 };
+      return new ResponseData(user, HttpStatus.SUCCESS, HttpMessage.SUCCESS);
     } catch (error) {
-      return { data: error, status: 400 };
+      return new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR);
     }
   }
 }
