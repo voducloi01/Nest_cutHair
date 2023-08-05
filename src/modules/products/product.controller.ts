@@ -39,7 +39,7 @@ export class ProductController {
       );
     } catch (error) {
       return new ResponseData<Product>(
-        null,
+        error,
         HttpStatus.ERROR,
         HttpMessage.ERROR,
       );

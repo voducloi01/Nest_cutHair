@@ -67,7 +67,7 @@ export class UserController {
       const user = await this.UserService.findUser({ email });
 
       if (!user) {
-        throw new BadRequestException('duplicate mail!q');
+        throw new BadRequestException('Not valid User !');
       }
 
       if (!(await bcrypt.compare(password, user.password))) {
