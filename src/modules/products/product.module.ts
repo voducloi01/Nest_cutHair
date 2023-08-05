@@ -6,9 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from 'src/midleware/auth.midleware';
 import { MulterModule } from '@nestjs/platform-express';
 import { ImageService } from './image-upload.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    JwtModule.register({
+      secret: 'secret',
+      signOptions: { expiresIn: '1d' },
+    }),
     TypeOrmModule.forFeature([ProductEntity]),
     MulterModule.registerAsync({
       useClass: ImageService,

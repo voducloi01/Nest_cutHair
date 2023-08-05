@@ -4,7 +4,6 @@ import { OrderCutEntity } from 'src/entities/orderCut.entity';
 import { Repository } from 'typeorm';
 import { OrderCutDto } from 'src/dto/orderCut.dto';
 import * as nodemailer from 'nodemailer';
-import moment from 'moment-timezone';
 
 @Injectable()
 export class OrderService {
