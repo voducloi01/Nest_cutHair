@@ -72,6 +72,9 @@ export class ProductController {
     @Body(new ValidationPipe()) productDto: ProductDto,
   ): Promise<ResponseData<Product>> {
     try {
+      if (!file) {
+        throw new NotFoundException(`Invalid Image`);
+      }
       if (file) {
         const url = await this.imgservice.uploadImage(file);
         const dataCopy = {
@@ -87,7 +90,7 @@ export class ProductController {
       }
     } catch (error) {
       return new ResponseData<Product>(
-        null,
+        error,
         HttpStatus.ERROR,
         HttpMessage.ERROR,
       );

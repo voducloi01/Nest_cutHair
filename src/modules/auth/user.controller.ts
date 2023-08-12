@@ -78,14 +78,14 @@ export class UserController {
       response.cookie('jwt', jwt, { httpOnly: true });
       return response.json(
         new ResponseData(
-          { token: jwt },
+          { token: jwt, user: { name: user.name } },
           HttpStatus.SUCCESS,
           HttpMessage.SUCCESS,
         ),
       );
     } catch (error) {
       return response.json(
-        new ResponseData(error, HttpStatus.SUCCESS, HttpMessage.SUCCESS),
+        new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR),
       );
     }
   }
@@ -114,7 +114,6 @@ export class UserController {
   @Post('logout')
   async logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('jwt');
-
     return {
       message: 'success',
     };

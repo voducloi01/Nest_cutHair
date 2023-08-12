@@ -1,10 +1,10 @@
-import { MinLength, IsNotEmpty, IsNumber } from 'class-validator';
+import { MinLength, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class ProductDto {
   @IsNotEmpty()
   categoryId?: number;
 
-  @MinLength(1, { message: 'This field must be than 5 character Nine Dev!' })
+  @MinLength(1, { message: 'This field must be than 1 character Nine Dev!' })
   productName?: string;
 
   @IsNotEmpty()
