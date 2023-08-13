@@ -67,11 +67,15 @@ export class UserController {
       const user = await this.UserService.findUser({ email });
 
       if (!user) {
-        throw new BadRequestException('Not valid User !');
+        return response
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'User not found' });
       }
 
       if (!(await bcrypt.compare(password, user.password))) {
-        throw new BadRequestException('Password sai !');
+        return response
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'InValid Password!' });
       }
 
       const jwt = await this.jwtService.signAsync({ id: user.id });
