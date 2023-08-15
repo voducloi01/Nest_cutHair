@@ -80,10 +80,12 @@ export class UserController {
 
       const jwt = await this.jwtService.signAsync({ id: user.id });
       response.cookie('jwt', jwt, { httpOnly: true });
+
       const res = new ResponseData({
         jwt,
-        user,
-        HttpStatus: HttpStatus.SUCCESS,
+        name: user.name,
+        email: user.email,
+        statusCode: HttpStatus.SUCCESS,
         message: HttpMessage.SUCCESS,
       });
 
