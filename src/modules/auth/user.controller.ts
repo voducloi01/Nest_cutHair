@@ -76,13 +76,14 @@ export class UserController {
 
       const jwt = await this.jwtService.signAsync({ id: user.id });
       response.cookie('jwt', jwt, { httpOnly: true });
-      return response.json(
-        new ResponseData(
-          { token: jwt, user: { name: user.name } },
-          HttpStatus.SUCCESS,
-          HttpMessage.SUCCESS,
-        ),
-      );
+      const res = new ResponseData({
+        jwt,
+        user,
+        HttpStatus: HttpStatus.SUCCESS,
+        message: HttpMessage.SUCCESS,
+      });
+
+      return response.json(res.getRespon());
     } catch (error) {
       return response.json(
         new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR),
