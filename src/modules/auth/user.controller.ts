@@ -105,13 +105,6 @@ export class UserController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<ResponseType<User>> {
     try {
-      const cookie = request.cookies['jwt'];
-
-      const data = await this.jwtService.verifyAsync(cookie);
-
-      if (!data) {
-        throw new UnauthorizedException();
-      }
       const user = await this.UserService.getAllUser();
       return response.json(
         new ResponseData({
