@@ -11,15 +11,18 @@ import { UserEntity } from './entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
 import { OrderModule } from './modules/orderCut/order.module';
 import { OrderCutEntity } from './entities/orderCut.entity';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
-      port: 3309,
+      port: parseInt(process.env.DB_PORT),
       username: 'root',
-      password: 'Thuatien500',
+      password: process.env.DB_PASSWORD,
       database: 'ohayo_community',
       entities: [CategoriesEntity, UserEntity, ProductEntity, OrderCutEntity],
       synchronize: false,
