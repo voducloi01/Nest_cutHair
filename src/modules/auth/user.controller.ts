@@ -15,7 +15,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { userService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
-import { Response, Request } from 'express';
+import { Response, Request, response } from 'express';
 import { userDTO } from 'src/dto/user.dto';
 import { AuthMiddleware } from '../../midleware/auth.midleware';
 import { LoginDto } from 'src/dto/login.dto';
@@ -84,6 +84,7 @@ export class UserController {
       const res = new ResponseData({
         token: jwt,
         name: user.name,
+        role: user.role,
         email: user.email,
         statusCode: HttpStatus.SUCCESS,
         message: HttpMessage.SUCCESS,
@@ -98,7 +99,10 @@ export class UserController {
   }
 
   @Get('user')
-  async user(@Req() request: Request): Promise<ResponseType<User>> {
+  async user(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<ResponseType<User>> {
     try {
       const cookie = request.cookies['jwt'];
 
@@ -107,14 +111,22 @@ export class UserController {
       if (!data) {
         throw new UnauthorizedException();
       }
-
-      const user = await this.UserService.findUser({ id: data?.id });
-
-      const { password, ...result } = user;
-
-      return new ResponseData(result, HttpStatus.SUCCESS, HttpMessage.SUCCESS);
+      const user = await this.UserService.getAllUser();
+      return response.json(
+        new ResponseData({
+          user,
+          statusCode: HttpStatus.SUCCESS,
+          message: HttpMessage.SUCCESS,
+        }).getRespon(),
+      );
     } catch (e) {
-      return new ResponseData(e, HttpStatus.ERROR, HttpMessage.ERROR);
+      return response.json(
+        new ResponseData({
+          e,
+          statusCode: HttpStatus.ERROR,
+          message: HttpMessage.ERROR,
+        }).getRespon(),
+      );
     }
   }
 

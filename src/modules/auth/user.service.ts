@@ -29,6 +29,10 @@ export class userService {
     return this.userRepository.findOne({ where: data });
   }
 
+  async getAllUser(): Promise<UserEntity[]> {
+    return this.userRepository.find();
+  }
+
   async updateUser(id: number, data: userDTO) {
     // Kiểm tra sự tồn tại của sản phẩm với ID tương ứng
     const user = await this.userRepository.findOneBy({ id: id });
