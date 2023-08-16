@@ -80,46 +80,46 @@ export class UserController {
       const jwt = await this.jwtService.signAsync({ id: user.id });
       response.cookie('jwt', jwt, { httpOnly: true });
 
-      const res = new ResponseData({
-        userInfo: {
-          name: user.name,
-          email: user.email,
-          role: user.role,
+      const res = new ResponseData(
+        {
+          userInfo: {
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          },
+          token: jwt,
         },
-        token: jwt,
-        statusCode: HttpStatus.SUCCESS,
-        message: HttpMessage.SUCCESS,
-      });
-
-      return response.json(res.getResponse());
-    } catch (error) {
-      return response.json(
-        new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR),
+        HttpStatus.SUCCESS,
+        HttpMessage.SUCCESS,
       );
+
+      return res.getResponseLogin();
+    } catch (error) {
+      const res = new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR);
+      return res.getResponseLogin();
     }
   }
 
   @Get('api/users')
-  async user(
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<ResponseType<User>> {
+  async user(): Promise<any> {
     try {
-      const user = await this.UserService.getAllUser();
-      return response.json(
-        new ResponseData({
-          result: user,
-          statusCode: HttpStatus.SUCCESS,
-          message: HttpMessage.SUCCESS,
-        }).getResponse(),
+      const users = await this.UserService.getAllUser();
+
+      const responseData = new ResponseData<User[]>(
+        users,
+        HttpStatus.SUCCESS,
+        HttpMessage.SUCCESS,
       );
-    } catch (e) {
-      return response.json(
-        new ResponseData({
-          e,
-          statusCode: HttpStatus.ERROR,
-          message: HttpMessage.ERROR,
-        }).getResponse(),
+
+      return responseData.getResponse();
+    } catch (error) {
+      const errorResponse = new ResponseData(
+        error.message || error.toString(),
+        HttpStatus.ERROR,
+        HttpMessage.ERROR,
       );
+
+      return errorResponse.getResponse();
     }
   }
 
