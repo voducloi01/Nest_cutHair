@@ -25,7 +25,7 @@ import { ResponseData } from 'src/global/globalClass';
 import { ResponseType } from 'src/global/globalType';
 
 @UseGuards(AuthMiddleware)
-@Controller('users')
+@Controller()
 export class UserController {
   constructor(
     private readonly UserService: userService,
@@ -98,7 +98,7 @@ export class UserController {
     }
   }
 
-  @Get('user')
+  @Get('users')
   async user(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
@@ -114,7 +114,7 @@ export class UserController {
       const user = await this.UserService.getAllUser();
       return response.json(
         new ResponseData({
-          user,
+          result: user,
           statusCode: HttpStatus.SUCCESS,
           message: HttpMessage.SUCCESS,
         }).getRespon(),
