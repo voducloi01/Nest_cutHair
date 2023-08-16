@@ -101,7 +101,6 @@ export class UserController {
 
   @Get('api/users')
   async user(
-    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<ResponseType<User>> {
     try {
