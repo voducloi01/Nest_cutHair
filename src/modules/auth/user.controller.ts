@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -15,7 +14,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { userService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
-import { Response, Request, response } from 'express';
+import { Response, Request } from 'express';
 import { userDTO } from 'src/dto/user.dto';
 import { AuthMiddleware } from '../../midleware/auth.midleware';
 import { LoginDto } from 'src/dto/login.dto';
@@ -32,7 +31,7 @@ export class UserController {
     private jwtService: JwtService,
   ) {}
 
-  @Post('register')
+  @Post('api/register')
   async register(
     @Body() UserDto: userDTO,
     @Res() res: Response,
@@ -57,7 +56,7 @@ export class UserController {
     }
   }
 
-  @Post('login')
+  @Post('api/login')
   async login(
     @Body(new ValidationPipe()) body: LoginDto,
     @Res({ passthrough: true }) response: Response,
@@ -82,15 +81,17 @@ export class UserController {
       response.cookie('jwt', jwt, { httpOnly: true });
 
       const res = new ResponseData({
+        userInfo: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
         token: jwt,
-        name: user.name,
-        role: user.role,
-        email: user.email,
         statusCode: HttpStatus.SUCCESS,
         message: HttpMessage.SUCCESS,
       });
 
-      return response.json(res.getRespon());
+      return response.json(res.getResponse());
     } catch (error) {
       return response.json(
         new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR),
@@ -98,7 +99,7 @@ export class UserController {
     }
   }
 
-  @Get('users')
+  @Get('api/users')
   async user(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
@@ -117,7 +118,7 @@ export class UserController {
           result: user,
           statusCode: HttpStatus.SUCCESS,
           message: HttpMessage.SUCCESS,
-        }).getRespon(),
+        }).getResponse(),
       );
     } catch (e) {
       return response.json(
@@ -125,19 +126,19 @@ export class UserController {
           e,
           statusCode: HttpStatus.ERROR,
           message: HttpMessage.ERROR,
-        }).getRespon(),
+        }).getResponse(),
       );
     }
   }
 
-  @Post('logout')
+  @Post('api/logout')
   async logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('jwt');
     return {
       message: 'success',
     };
   }
-  @Put('/update/:id')
+  @Put('api/user/:id')
   async updateUser(
     @Param('id') id: number,
     @Body(new ValidationPipe()) body: userDTO,
