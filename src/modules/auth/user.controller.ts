@@ -78,7 +78,7 @@ export class UserController {
       response.cookie('jwt', jwt, { httpOnly: true });
 
       const res = new ResponseData({
-        jwt,
+        token: jwt,
         name: user.name,
         email: user.email,
         statusCode: HttpStatus.SUCCESS,
