@@ -11,7 +11,7 @@ export class ResponseData<D> {
     return this;
   }
 
-  getRespon() {
+  getResponse() {
     return this.data;
   }
 }
