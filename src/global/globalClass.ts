@@ -12,6 +12,18 @@ export class ResponseData<D> {
   }
 
   getResponse() {
-    return this.data;
+    const responseData = {
+      result: this.data,
+      statusCode: this.statusCode,
+      message: this.message,
+    };
+    return responseData;
+  }
+
+  getResponseLogin() {
+    return Object.assign({}, this.data, {
+      message: this.message,
+      statusCode: this.statusCode,
+    });
   }
 }
