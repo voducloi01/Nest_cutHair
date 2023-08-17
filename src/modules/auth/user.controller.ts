@@ -1,7 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -18,10 +21,10 @@ import { Response, Request } from 'express';
 import { userDTO } from 'src/dto/user.dto';
 import { AuthMiddleware } from '../../midleware/auth.midleware';
 import { LoginDto } from 'src/dto/login.dto';
-import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
+import { HttpMessage } from 'src/global/globalEnum';
 import { User } from 'src/models/user.model';
 import { ResponseData } from 'src/global/globalClass';
-import { ResponseType } from 'src/global/globalType';
+import { LoginResponse, ResponseType } from 'src/global/globalType';
 
 @UseGuards(AuthMiddleware)
 @Controller()
@@ -46,57 +49,42 @@ export class UserController {
       });
       delete (await userCopy).password;
 
-      return res.json(
-        new ResponseData(userCopy, HttpStatus.SUCCESS, HttpMessage.SUCCESS),
-      );
+      return res.json(new ResponseData(userCopy));
     } catch (error) {
-      return res.json(
-        new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR),
-      );
+      return res.json(new ResponseData(error));
     }
   }
 
   @Post('api/login')
+  @HttpCode(HttpStatus.OK)
   async login(
     @Body(new ValidationPipe()) body: LoginDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<ResponseType<User>> {
-    try {
-      const { email, password } = body;
-      const user = await this.UserService.findUser({ email });
+  ): Promise<LoginResponse> {
+    const { email, password } = body;
+    const user = await this.UserService.findUser({ email });
 
-      if (!user) {
-        return response
-          .status(HttpStatus.NOT_FOUND)
-          .json({ message: 'User not found' });
-      }
-
-      if (!(await bcrypt.compare(password, user.password))) {
-        return response
-          .status(HttpStatus.NOT_FOUND)
-          .json({ message: 'InValid Password!' });
-      }
-
-      const jwt = await this.jwtService.signAsync({ id: user.id });
-      response.cookie('jwt', jwt, { httpOnly: true });
-
-      const res = new ResponseData({
-        userInfo: {
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-        token: jwt,
-        statusCode: HttpStatus.SUCCESS,
-        message: HttpMessage.SUCCESS,
-      });
-
-      return response.json(res.getResponse());
-    } catch (error) {
-      return response.json(
-        new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR),
-      );
+    if (!user) {
+      throw new BadRequestException('User not exit');
     }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new BadRequestException('Invalid password');
+    }
+
+    const jwt = await this.jwtService.signAsync({ id: user.id });
+    response.cookie('jwt', jwt, { httpOnly: true });
+
+    const res = {
+      userInfo: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      token: jwt,
+    };
+
+    return res;
   }
 
   @Get('api/users')
@@ -108,16 +96,12 @@ export class UserController {
       return response.json(
         new ResponseData({
           result: user,
-          statusCode: HttpStatus.SUCCESS,
-          message: HttpMessage.SUCCESS,
         }).getResponse(),
       );
     } catch (e) {
       return response.json(
         new ResponseData({
           e,
-          statusCode: HttpStatus.ERROR,
-          message: HttpMessage.ERROR,
         }).getResponse(),
       );
     }
@@ -137,9 +121,9 @@ export class UserController {
   ): Promise<ResponseType<User>> {
     try {
       const user = await this.UserService.updateUser(id, body);
-      return new ResponseData(user, HttpStatus.SUCCESS, HttpMessage.SUCCESS);
+      return new ResponseData(user);
     } catch (error) {
-      return new ResponseData(error, HttpStatus.ERROR, HttpMessage.ERROR);
+      return new ResponseData(error);
     }
   }
 }
