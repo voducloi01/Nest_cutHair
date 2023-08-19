@@ -3,7 +3,7 @@ import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { ProductEntity } from 'src/entities/product.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthMiddleware } from 'src/midleware/auth.midleware';
+import { AuthMiddleware } from 'src/shared/middlewares/auth.midleware';
 import { MulterModule } from '@nestjs/platform-express';
 import { ImageService } from './image-upload.service';
 import { JwtModule } from '@nestjs/jwt';

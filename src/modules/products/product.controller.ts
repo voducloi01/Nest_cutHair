@@ -17,8 +17,8 @@ import { ProductService } from './product.service';
 import { ResponseData } from 'src/global/globalClass';
 import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
 import { Product } from 'src/models/product.model';
-import { ProductDto } from 'src/dto/product.dto';
-import { AuthMiddleware } from 'src/midleware/auth.midleware';
+import { ProductDto } from 'src/modules/products/dto/product.dto';
+import { AuthMiddleware } from 'src/shared/middlewares/auth.midleware';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageService } from './image-upload.service';
 @UseGuards(AuthMiddleware)
