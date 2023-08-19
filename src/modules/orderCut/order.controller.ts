@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { OrderCutDto } from 'src/dto/orderCut.dto';
+import { OrderCutDto } from 'src/modules/orderCut/dto/orderCut.dto';
 import { ResponseData } from 'src/global/globalClass';
 import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
 import { OrderModel } from 'src/models/order.model';

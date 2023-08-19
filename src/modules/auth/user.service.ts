@@ -1,57 +1,111 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { userDTO } from 'src/dto/user.dto';
-import { UserEntity } from 'src/entities/user.entity';
-import { User } from 'src/models/user.model';
-import { ROLE } from 'src/until/constants';
+import { UserEntity } from '../../entities/user.entity';
+import { JWT, ROLE } from '../../shared/constants';
 import { Repository } from 'typeorm';
+import { LoginDto } from './dto/login.dto';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import {
+  LoginResponse,
+  LogoutResponse,
+  RegisterResponse,
+  UserResponse,
+} from '../../shared/types/response.type';
+import { RegisterDto } from './dto/register.dto';
+import { Response } from 'express';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
-export class userService {
+export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private jwtService: JwtService,
   ) {}
 
-  async create(data: User): Promise<UserEntity> {
-    const checkMail = await this.userRepository.findOne({
-      where: { email: data.email },
+  async register(params: RegisterDto): Promise<RegisterResponse> {
+    const { name, email, password } = params;
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const checkEmail = await this.userRepository.findOne({
+      where: { email: email },
     });
 
-    if (checkMail) {
-      throw new NotFoundException(`Email này đã tồn tại !`);
+    if (checkEmail) {
+      throw new BadRequestException(`Email already exists !`);
     }
-    const user = this.userRepository.save(data);
-    return user;
+    const data = {
+      name: name,
+      email: email,
+      password: hashedPassword,
+    };
+
+    const saveData = await this.userRepository.save(data);
+
+    return {
+      userInfo: {
+        name: saveData.name,
+        email: saveData.email,
+      },
+      message: `${saveData.name} register successfully`,
+    };
   }
 
-  async findUser(data: any): Promise<UserEntity> {
-    return this.userRepository.findOne({ where: data });
+  async login(params: LoginDto, response: Response): Promise<LoginResponse> {
+    const { email, password } = params;
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new BadRequestException('Invalid user');
+    }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new BadRequestException('Invalid password');
+    }
+    const jwt = await this.jwtService.signAsync({ id: user.id });
+    response.cookie(JWT, jwt, { httpOnly: true });
+
+    return {
+      userInfo: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      token: jwt,
+    };
   }
 
-  async getAllUser(): Promise<UserEntity[]> {
-    return this.userRepository.find();
+  async getUsers(): Promise<UserResponse[]> {
+    const users = await this.userRepository.find();
+    return users;
   }
 
-  async updateUser(id: number, data: userDTO) {
-    // Kiểm tra sự tồn tại của sản phẩm với ID tương ứng
+  async logout(response: Response): Promise<LogoutResponse> {
+    response.clearCookie(JWT);
+    return {
+      message: 'Logout successfully',
+    };
+  }
+
+  async updateUser(id: number, params: UserDto): Promise<UserResponse> {
     const user = await this.userRepository.findOneBy({ id: id });
 
     if (!user) {
-      throw new NotFoundException(`Không tìm thấy User với ID ${id}`);
+      throw new BadRequestException(`Can't find user with id : ${id}`);
     }
 
-    if (data.role) {
-      if (data.role !== ROLE.Admin && data.role !== ROLE.Staff) {
-        throw new NotFoundException('Role is not exits!');
+    if (params.role) {
+      if (params.role !== ROLE.Admin && params.role !== ROLE.Staff) {
+        throw new BadRequestException('Role already exits !');
       }
     }
 
-    const updateUser = await this.userRepository.save({
+    const newUser = {
       ...user,
-      ...data,
-    });
+      ...params,
+    };
 
-    return updateUser;
+    return await this.userRepository.save(newUser);
   }
 }

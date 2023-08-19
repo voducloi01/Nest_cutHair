@@ -1,4 +1,8 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  Injectable,
+  NestMiddleware,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { JwtService } from '@nestjs/jwt';
 
@@ -10,8 +14,8 @@ export class AuthMiddleware implements NestMiddleware {
     try {
       this.jwtService.verify(token);
       next();
-    } catch (error) {
-      return res.status(401).json({ message: 'Invalid token.' });
+    } catch (_) {
+      throw new UnauthorizedException('Invalid token.');
     }
   }
 }

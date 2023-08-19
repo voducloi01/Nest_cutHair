@@ -5,11 +5,11 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from 'src/entities/user.entity';
-import { UserController } from './user.controller';
-import { userService } from './user.service';
+import { UserEntity } from '../../entities/user.entity';
+import { AuthController } from './user.controller';
+import { UserService } from './user.service';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthMiddleware } from '../../midleware/auth.midleware';
+import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 
 @Module({
   imports: [
@@ -19,8 +19,8 @@ import { AuthMiddleware } from '../../midleware/auth.midleware';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  controllers: [UserController],
-  providers: [userService],
+  controllers: [AuthController],
+  providers: [UserService],
 })
 export class userModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {

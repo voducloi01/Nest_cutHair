@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderCutEntity } from 'src/entities/orderCut.entity';
 import { Repository } from 'typeorm';
-import { OrderCutDto } from 'src/dto/orderCut.dto';
+import { OrderCutDto } from 'src/modules/orderCut/dto/orderCut.dto';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()

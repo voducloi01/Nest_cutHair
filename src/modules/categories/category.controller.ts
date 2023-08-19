@@ -15,7 +15,7 @@ import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
 import { ResponseType } from 'src/global/globalType';
 import { Category } from 'src/models/category.model';
 import { CategoryService } from './category.service';
-import { CategoryDto } from 'src/dto/category.dto';
+import { CategoryDto } from 'src/modules/categories/dto/category.dto';
 
 @Controller('categories')
 export class CategoryController {
