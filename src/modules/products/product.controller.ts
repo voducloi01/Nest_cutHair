@@ -7,7 +7,6 @@ import {
   Param,
   Post,
   Put,
-  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -26,7 +25,7 @@ import { ImageService } from './image-upload.service';
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
-    private readonly imgservice: ImageService,
+    private readonly imgService: ImageService,
   ) {}
 
   @Get()
@@ -76,7 +75,7 @@ export class ProductController {
         throw new NotFoundException(`Invalid Image`);
       }
       if (file) {
-        const url = await this.imgservice.uploadImage(file);
+        const url = await this.imgService.uploadImage(file);
         const dataCopy = {
           ...productDto,
           urlImg: url,
@@ -126,7 +125,7 @@ export class ProductController {
       const product = await this.productService.getProductId(id);
 
       if (product.nameImg !== file.originalname) {
-        const url = await this.imgservice.uploadImage(file);
+        const url = await this.imgService.uploadImage(file);
 
         data = { ...updatedProduct, urlImg: url, nameImg: file.originalname };
       } else {
