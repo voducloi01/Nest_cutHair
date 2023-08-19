@@ -12,7 +12,6 @@ import { ProductEntity } from './entities/product.entity';
 import { OrderModule } from './modules/orderCut/order.module';
 import { OrderCutEntity } from './entities/orderCut.entity';
 import * as dotenv from 'dotenv';
-
 dotenv.config();
 
 @Module({

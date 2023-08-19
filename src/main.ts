@@ -1,22 +1,19 @@
-declare const module: any;
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from './validation.pipe';
-import { config } from 'dotenv';
-config();
 import { v2 as cloudinary } from 'cloudinary';
 import './config/cloudinary.config';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
-  app.use(cookieParser());
   app.enableCors({
-    origin: 'http://localhost:5000',
-    credentials: true,
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
+  app.useGlobalPipes(new ValidationPipe());
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
@@ -28,11 +25,14 @@ async function bootstrap() {
     api_secret: apiSecret,
   });
 
-  await app.listen(3000);
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
+  const port = process.env.APP_PORT || 3000;
+  await app.listen(port, '0.0.0.0', () => {
+    new Logger('Application').log(
+      `Service started successfully at port ${port}`,
+    );
+  });
 }
-bootstrap();
+
+(async () => {
+  await bootstrap();
+})();
