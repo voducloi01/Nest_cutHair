@@ -36,12 +36,12 @@ import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 export class AuthController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('api/register')
+  @Post('api/create-user')
   @HttpCode(HttpStatus.OK)
   @UseGuards(RegisterGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   async register(@Body() params: RegisterDto): Promise<RegisterResponse> {
-    return this.userService.register(params);
+    return this.userService.createUser(params);
   }
 
   @Post('api/login')

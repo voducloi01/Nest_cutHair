@@ -26,7 +26,7 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
-  async register(params: RegisterDto): Promise<RegisterResponse> {
+  async createUser(params: RegisterDto): Promise<RegisterResponse> {
     const { name, email, password } = params;
     const hashedPassword = await bcrypt.hash(password, 12);
 
