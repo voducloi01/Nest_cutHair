@@ -22,12 +22,7 @@ export class RegisterGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const body = req.body;
-    if (
-      body.name &&
-      body.email &&
-      body.password &&
-      Object.keys(body).length === 3
-    ) {
+    if (Object.keys(body).length <= 3) {
       return true;
     }
     throw new InternalServerErrorException('Internal server error');
