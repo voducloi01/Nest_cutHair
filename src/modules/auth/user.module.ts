@@ -4,11 +4,11 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from '../../entities/user.entity';
 import { AuthController } from './user.controller';
 import { UserService } from './user.service';
-import { JwtModule } from '@nestjs/jwt';
+import { UserEntity } from '../../entities/user.entity';
 import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 
 @Module({

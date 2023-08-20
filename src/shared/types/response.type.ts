@@ -22,3 +22,5 @@ export type UserResponse = UserEntity;
 export type LogoutResponse = {
   message: string;
 };
+
+export type DeleteUser = LogoutResponse;

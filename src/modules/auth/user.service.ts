@@ -1,20 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from '../../entities/user.entity';
-import { JWT, ROLE } from '../../shared/constants';
+import { Response } from 'express';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { RegisterDto } from './dto/register.dto';
+import { UserDto } from './dto/user.dto';
+import { LoginDto } from './dto/login.dto';
+import { UserEntity } from '../../entities/user.entity';
+import { JWT, ROLE } from '../../shared/constants/constants';
 import {
+  DeleteUser,
   LoginResponse,
   LogoutResponse,
   RegisterResponse,
   UserResponse,
 } from '../../shared/types/response.type';
-import { RegisterDto } from './dto/register.dto';
-import { Response } from 'express';
-import { UserDto } from './dto/user.dto';
-import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class UserService {
@@ -104,8 +105,23 @@ export class UserService {
     const newUser = {
       ...user,
       ...params,
+      message: 'Update successfully',
     };
 
     return await this.userRepository.save(newUser);
+  }
+
+  async deleteUser(id: number): Promise<DeleteUser> {
+    const user = await this.userRepository.findOneBy({ id: id });
+
+    if (!user) {
+      throw new BadRequestException(`Can't find user with id : ${id}`);
+    }
+
+    await this.userRepository.remove(user);
+
+    return {
+      message: `User ${user.name} delete successfully`,
+    };
   }
 }

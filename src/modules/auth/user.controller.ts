@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -12,10 +13,13 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { UserService } from './user.service';
 import { Response } from 'express';
-import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
+import { UserService } from './user.service';
+import { UserDto } from './dto/user.dto';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 import {
+  DeleteUser,
   LoginResponse,
   RegisterResponse,
   UserResponse,
@@ -25,9 +29,7 @@ import {
   LoginGuard,
   UserGuard,
 } from '../../shared/guards/auth.guard';
-import { UserDto } from './dto/user.dto';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 
 @Controller()
 export class AuthController {
@@ -66,7 +68,7 @@ export class AuthController {
     return this.logout(response);
   }
 
-  @Put('api/user/:id')
+  @Put('api/update-user/:id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthMiddleware)
   async updateUser(
@@ -74,5 +76,12 @@ export class AuthController {
     @Body(new ValidationPipe()) params: UserDto,
   ): Promise<UserResponse> {
     return this.userService.updateUser(id, params);
+  }
+
+  @Delete('api/delete-user/:id')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthMiddleware)
+  async deleteUser(@Param('id') id: number): Promise<DeleteUser> {
+    return this.userService.deleteUser(id);
   }
 }
