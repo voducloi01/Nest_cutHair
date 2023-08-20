@@ -1,9 +1,9 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
-import { ProductEntity } from 'src/entities/product.entity';
+import { ProductEntity } from '../../entities/product.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthMiddleware } from 'src/shared/middlewares/auth.midleware';
+import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 import { MulterModule } from '@nestjs/platform-express';
 import { ImageService } from './image-upload.service';
 import { JwtModule } from '@nestjs/jwt';

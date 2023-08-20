@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CategoriesEntity } from 'src/entities/categories.entity';
-import { Category } from 'src/models/category.model';
+import { CategoriesEntity } from '../../entities/categories.entity';
+import { Category } from '../../models/category.model';
 import { DeleteResult, Repository } from 'typeorm';
 
 @Injectable()

@@ -8,117 +8,107 @@ import {
   Put,
   ValidationPipe,
   Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ResponseData } from 'src/global/globalClass';
-import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
-import { ResponseType } from 'src/global/globalType';
-import { Category } from 'src/models/category.model';
+import { ResponseData } from '../../global/globalClass';
+import { HttpMessage } from '../../global/globalEnum';
 import { CategoryService } from './category.service';
-import { CategoryDto } from 'src/modules/categories/dto/category.dto';
+import { CategoryDto } from './dto/category.dto';
+import { Category } from '.../../models/category.model';
 
 @Controller('categories')
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
   @Get()
-  async list(@Res() res: Response): Promise<ResponseType<Category>> {
+  @HttpCode(HttpStatus.OK)
+  async list(@Res() res: Response): Promise<any> {
     try {
       return res.json(
         new ResponseData(
           await this.categoryService.findAll(),
-          HttpStatus.SUCCESS,
+          HttpStatus.OK,
           HttpMessage.SUCCESS,
         ),
       );
     } catch (error) {
-      return res.json(
-        new ResponseData(null, HttpStatus.ERROR, HttpMessage.ERROR),
-      );
+      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
     }
   }
 
   @Get('/:id')
-  async detail(
-    @Param('id') id: number,
-    @Res() res: Response,
-  ): Promise<ResponseType<Category>> {
+  @HttpCode(HttpStatus.OK)
+  async detail(@Param('id') id: number, @Res() res: Response): Promise<any> {
     try {
       return res.json(
         new ResponseData(
           await this.categoryService.findById(id),
-          HttpStatus.SUCCESS,
+          HttpStatus.OK,
           HttpMessage.SUCCESS,
         ),
       );
     } catch (error) {
-      return res.json(
-        new ResponseData(null, HttpStatus.ERROR, HttpMessage.ERROR),
-      );
+      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
     }
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   async create(
     @Body(new ValidationPipe()) category: CategoryDto,
     @Res() res: Response,
-  ): Promise<ResponseType<Category>> {
+  ): Promise<any> {
     try {
       return res.json(
         new ResponseData(
           await this.categoryService.create(category),
-          HttpStatus.SUCCESS,
+          HttpStatus.OK,
           HttpMessage.SUCCESS,
         ),
       );
     } catch (error) {
-      return res.json(
-        new ResponseData(null, HttpStatus.ERROR, HttpMessage.ERROR),
-      );
+      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
     }
   }
 
   @Put('/:id')
+  @HttpCode(HttpStatus.OK)
   async update(
     @Param('id') id: number,
     @Body(new ValidationPipe()) category: CategoryDto,
     @Res() res: Response,
-  ): Promise<ResponseType<Category>> {
+  ): Promise<any> {
     try {
       return res.json(
         new ResponseData(
           await this.categoryService.update(id, category),
-          HttpStatus.SUCCESS,
+          HttpStatus.OK,
           HttpMessage.SUCCESS,
         ),
       );
     } catch (error) {
-      return res.json(
-        new ResponseData(null, HttpStatus.ERROR, HttpMessage.ERROR),
-      );
+      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
     }
   }
 
   @Delete('/:id')
-  async delete(
-    @Param('id') id: number,
-    @Res() res: Response,
-  ): Promise<ResponseType<boolean>> {
+  @HttpCode(HttpStatus.OK)
+  async delete(@Param('id') id: number, @Res() res: Response): Promise<any> {
     try {
       const isFlag: boolean = await this.categoryService.delete(id);
       if (isFlag) {
         return res.json(
-          new ResponseData(isFlag, HttpStatus.SUCCESS, HttpMessage.SUCCESS),
+          new ResponseData(isFlag, HttpStatus.OK, HttpMessage.SUCCESS),
         );
       } else {
         return res.json(
-          new ResponseData(isFlag, HttpStatus.ERROR, HttpMessage.ERROR),
+          new ResponseData(isFlag, HttpStatus.OK, HttpMessage.ERROR),
         );
       }
     } catch (error) {
-      return res.json(
-        new ResponseData(null, HttpStatus.ERROR, HttpMessage.ERROR),
-      );
+      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
     }
   }
 }

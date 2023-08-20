@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrderCutEntity } from 'src/entities/orderCut.entity';
-import { AuthMiddleware } from 'src/shared/middlewares/auth.midleware';
+import { OrderCutEntity } from '../../entities/orderCut.entity';
+import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 
