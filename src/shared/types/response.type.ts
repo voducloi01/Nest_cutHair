@@ -17,10 +17,12 @@ export type RegisterResponse = {
   message: string;
 };
 
-export type UserResponse = UserEntity;
+export type UserResponse = { result: UserEntity[] };
 
 export type LogoutResponse = {
   message: string;
 };
+
+export type UpdateUser = UserEntity;
 
 export type DeleteUser = LogoutResponse;

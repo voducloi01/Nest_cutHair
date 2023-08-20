@@ -14,6 +14,7 @@ import {
   LoginResponse,
   LogoutResponse,
   RegisterResponse,
+  UpdateUser,
   UserResponse,
 } from '../../shared/types/response.type';
 
@@ -77,9 +78,9 @@ export class UserService {
     };
   }
 
-  async getUsers(): Promise<UserResponse[]> {
+  async getUsers(): Promise<UserResponse> {
     const users = await this.userRepository.find();
-    return users;
+    return { result: users };
   }
 
   async logout(response: Response): Promise<LogoutResponse> {
@@ -89,7 +90,7 @@ export class UserService {
     };
   }
 
-  async updateUser(id: number, params: UserDto): Promise<UserResponse> {
+  async updateUser(id: number, params: UserDto): Promise<UpdateUser> {
     const user = await this.userRepository.findOneBy({ id: id });
 
     if (!user) {

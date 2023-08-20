@@ -22,6 +22,7 @@ import {
   DeleteUser,
   LoginResponse,
   RegisterResponse,
+  UpdateUser,
   UserResponse,
 } from '../../shared/types/response.type';
 import {
@@ -57,7 +58,7 @@ export class AuthController {
   @Get('api/users')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthMiddleware, UserGuard)
-  async getUsers(): Promise<UserResponse[]> {
+  async getUsers(): Promise<UserResponse> {
     return this.userService.getUsers();
   }
 
@@ -74,7 +75,7 @@ export class AuthController {
   async updateUser(
     @Param('id') id: number,
     @Body(new ValidationPipe()) params: UserDto,
-  ): Promise<UserResponse> {
+  ): Promise<UpdateUser> {
     return this.userService.updateUser(id, params);
   }
 
