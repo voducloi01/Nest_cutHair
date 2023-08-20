@@ -1,5 +1,3 @@
-import { UserEntity } from '../../entities/user.entity';
-
 export type LoginResponse = {
   userInfo: {
     name: string;
@@ -17,7 +15,14 @@ export type RegisterResponse = {
   message: string;
 };
 
-export type UserResponse = { result: UserEntity[] };
+export type UserResponse = {
+  result: {
+    id: number;
+    name: string;
+    email: string;
+    role: number;
+  }[];
+};
 
 export type LogoutResponse = {
   message: string;

@@ -80,7 +80,17 @@ export class UserService {
 
   async getUsers(): Promise<UserResponse> {
     const users = await this.userRepository.find();
-    return { result: users };
+
+    const userResponses = users.map((user) => {
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+    });
+
+    return { result: userResponses };
   }
 
   async logout(response: Response): Promise<LogoutResponse> {

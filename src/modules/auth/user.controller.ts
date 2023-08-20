@@ -66,7 +66,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(UserGuard)
   async logout(@Res({ passthrough: true }) response: Response) {
-    return this.logout(response);
+    return this.userService.logout(response);
   }
 
   @Put('api/update-user/:id')
