@@ -23,6 +23,13 @@ export type LogoutResponse = {
   message: string;
 };
 
-export type UpdateUser = UserEntity;
+export type UpdateUser = {
+  result: {
+    name: string;
+    email: string;
+    role: number;
+  };
+  message: string;
+};
 
 export type DeleteUser = LogoutResponse;

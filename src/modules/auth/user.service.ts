@@ -92,7 +92,6 @@ export class UserService {
 
   async updateUser(id: number, params: UserDto): Promise<UpdateUser> {
     const user = await this.userRepository.findOneBy({ id: id });
-    const hashedPassword = await bcrypt.hash(user.password, 12);
 
     if (!user) {
       throw new BadRequestException(`Can't find user with id : ${id}`);
@@ -104,14 +103,18 @@ export class UserService {
       }
     }
 
-    const newUser = {
+    await this.userRepository.save({
       ...user,
       ...params,
-      password: hashedPassword,
-      message: 'Update successfully',
+    });
+
+    const newUser = {
+      name: params.name,
+      email: params.email,
+      role: params.role,
     };
 
-    return await this.userRepository.save(newUser);
+    return { result: newUser, message: 'Update successfully' };
   }
 
   async deleteUser(id: number): Promise<DeleteUser> {
