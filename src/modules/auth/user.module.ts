@@ -22,7 +22,7 @@ import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
   controllers: [AuthController],
   providers: [UserService],
 })
-export class userModule implements NestModule {
+export class UserModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)

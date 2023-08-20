@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
@@ -13,11 +15,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ResponseData } from 'src/global/globalClass';
-import { HttpMessage, HttpStatus } from 'src/global/globalEnum';
-import { Product } from 'src/models/product.model';
-import { ProductDto } from 'src/modules/products/dto/product.dto';
-import { AuthMiddleware } from 'src/shared/middlewares/auth.midleware';
+import { ResponseData } from '../../global/globalClass';
+import { HttpMessage } from '../../global/globalEnum';
+import { Product } from '../../models/product.model';
+import { ProductDto } from '../../modules/products/dto/product.dto';
+import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageService } from './image-upload.service';
 @UseGuards(AuthMiddleware)
@@ -29,42 +31,37 @@ export class ProductController {
   ) {}
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   async getAllProduct(): Promise<ResponseData<Product>> {
     try {
       return new ResponseData<Product>(
-        await this.productService.getAllproduct(),
-        HttpStatus.SUCCESS,
+        await this.productService.getAllProduct(),
+        HttpStatus.OK,
         HttpMessage.SUCCESS,
       );
     } catch (error) {
-      return new ResponseData<Product>(
-        error,
-        HttpStatus.ERROR,
-        HttpMessage.ERROR,
-      );
+      return new ResponseData<Product>(error, HttpStatus.OK, HttpMessage.ERROR);
     }
   }
 
   @Get('/:id')
+  @HttpCode(HttpStatus.OK)
   async GetProductById(
     @Param('id') id: number,
   ): Promise<ResponseData<Product>> {
     try {
       return new ResponseData<Product>(
         await this.productService.getProductId(id),
-        HttpStatus.SUCCESS,
+        HttpStatus.OK,
         HttpMessage.SUCCESS,
       );
     } catch (error) {
-      return new ResponseData<Product>(
-        null,
-        HttpStatus.ERROR,
-        HttpMessage.ERROR,
-      );
+      return new ResponseData<Product>(null, HttpStatus.OK, HttpMessage.ERROR);
     }
   }
 
   @Post('create')
+  @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('image'))
   async createProduct(
     @UploadedFile() file: Express.Multer.File,
@@ -83,26 +80,23 @@ export class ProductController {
         };
         return new ResponseData<Product>(
           await this.productService.createProduct(dataCopy),
-          HttpStatus.SUCCESS,
+          HttpStatus.OK,
           HttpMessage.SUCCESS,
         );
       }
     } catch (error) {
-      return new ResponseData<Product>(
-        error,
-        HttpStatus.ERROR,
-        HttpMessage.ERROR,
-      );
+      return new ResponseData<Product>(error, HttpStatus.OK, HttpMessage.ERROR);
     }
   }
 
   @Delete('delete/:id')
+  @HttpCode(HttpStatus.OK)
   async DeleteProduct(@Param('id') id: number): Promise<ResponseData<Product>> {
     try {
       await this.productService.deleteProduct(id);
       return new ResponseData<Product>(
         null,
-        HttpStatus.SUCCESS,
+        HttpStatus.OK,
         HttpMessage.SUCCESS,
       );
     } catch (error) {
@@ -114,6 +108,7 @@ export class ProductController {
   }
 
   @Put('update/:id')
+  @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('image'))
   async updateProduct(
     @Param('id') id: number,
@@ -137,15 +132,11 @@ export class ProductController {
       );
       return new ResponseData<Product>(
         updatedProductEntity,
-        HttpStatus.SUCCESS,
+        HttpStatus.OK,
         HttpMessage.SUCCESS,
       );
     } catch (error) {
-      return new ResponseData<Product>(
-        null,
-        HttpStatus.ERROR,
-        HttpMessage.ERROR,
-      );
+      return new ResponseData<Product>(null, HttpStatus.OK, HttpMessage.ERROR);
     }
   }
 }

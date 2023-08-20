@@ -1,13 +1,14 @@
-import { ProductModule } from './modules/products/product.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { UserModule } from './modules/auth/user.module';
+import { ProductModule } from './modules/products/product.module';
+import { OrderModule } from './modules/orderCut/order.module';
 import { CategoryModule } from './modules/categories/category.module';
 import { CategoriesEntity } from './entities/categories.entity';
 import { Module } from '@nestjs/common';
-import { userModule } from './modules/auth/user.module';
 import { UserEntity } from './entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
-import { OrderModule } from './modules/orderCut/order.module';
+
 import { OrderCutEntity } from './entities/orderCut.entity';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -26,7 +27,7 @@ dotenv.config();
     }),
     ProductModule,
     CategoryModule,
-    userModule,
+    UserModule,
     OrderModule,
   ],
   controllers: [],
