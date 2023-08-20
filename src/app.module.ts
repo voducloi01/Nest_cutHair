@@ -8,9 +8,8 @@ import { CategoriesEntity } from './entities/categories.entity';
 import { Module } from '@nestjs/common';
 import { UserEntity } from './entities/user.entity';
 import { ProductEntity } from './entities/product.entity';
-
 import { OrderCutEntity } from './entities/orderCut.entity';
-import * as dotenv from 'dotenv';
+import dotenv from 'dotenv';
 dotenv.config();
 
 @Module({
