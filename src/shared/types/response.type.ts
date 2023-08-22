@@ -38,3 +38,29 @@ export type UpdateUser = {
 };
 
 export type DeleteUser = LogoutResponse;
+
+export type ProductResponse = {
+  result?: {
+    id: number;
+    productName: string;
+    price: number;
+    categoryID: number;
+    urlImg: string;
+    nameImg: string;
+  };
+  message: string;
+};
+
+export type ProductType = {
+  id: number;
+  productName: string;
+  price: number;
+  categoryID: number;
+  urlImg: string;
+  nameImg: string;
+};
+
+export type GetProductResponse = {
+  result: ProductType[];
+  message: string;
+};
