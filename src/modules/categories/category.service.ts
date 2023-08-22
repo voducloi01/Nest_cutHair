@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesEntity } from '../../entities/categories.entity';
 import { Category } from '../../models/category.model';
-import { DeleteResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import {
+  CategoryResponse,
+  CategoryType,
+  GetAllCategoryResponse,
+} from 'shared/types/response.type';
 
 @Injectable()
 export class CategoryService {
@@ -11,25 +16,65 @@ export class CategoryService {
     private categoryRepository: Repository<CategoriesEntity>,
   ) {}
 
-  async findAll(): Promise<Category[]> {
-    return await this.categoryRepository.find();
+  async findAll(): Promise<GetAllCategoryResponse> {
+    const category = await this.categoryRepository.find();
+    const categoryCopy: CategoryType[] = category.map((e) => ({
+      id: e.id,
+      categoryName: e.categoryName,
+      description: e.description,
+    }));
+    return {
+      result: categoryCopy,
+      message: 'Get All Category!',
+    };
   }
 
-  async findById(id: number): Promise<Category> {
-    return await this.categoryRepository.findOne({ where: { id } });
+  async findById(id: number): Promise<CategoryResponse> {
+    const category: CategoryType = await this.categoryRepository.findOneBy({
+      id: id,
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Not Find Category ID ${id}`);
+    }
+    return {
+      result: {
+        id: category.id,
+        categoryName: category.categoryName,
+        description: category.description,
+      },
+      message: `Detail Category ID ${id}!`,
+    };
   }
 
-  async create(category: Category): Promise<Category> {
-    return await this.categoryRepository.save(category);
+  async create(body: Category): Promise<CategoryResponse> {
+    const category = await this.categoryRepository.save(body);
+    return {
+      result: category,
+      message: 'Create Category Successfully ! ',
+    };
   }
 
-  async update(id: number, category: Category): Promise<Category> {
-    await this.categoryRepository.update(id, category);
-    return this.findById(id);
+  async update(id: number, body: Category): Promise<CategoryResponse> {
+    const { result } = await this.findById(id);
+    const category = await this.categoryRepository.save({
+      ...result,
+      ...body,
+    });
+
+    return {
+      result: {
+        id: category.id,
+        categoryName: category.categoryName,
+        description: category.description,
+      },
+      message: 'Update Category Successfully',
+    };
   }
 
-  async delete(id: number): Promise<boolean> {
-    const isFlag: DeleteResult = await this.categoryRepository.delete(id);
-    return isFlag.affected === 1;
+  async delete(id: number): Promise<CategoryResponse> {
+    await this.findById(id);
+    await this.categoryRepository.delete(id);
+    return { message: `Delete Successfully Category ID ${id}!` };
   }
 }
