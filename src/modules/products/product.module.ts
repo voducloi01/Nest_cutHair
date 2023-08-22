@@ -24,6 +24,6 @@ import { JwtModule } from '@nestjs/jwt';
 })
 export class ProductModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(ProductController);
+    //consumer.apply(AuthMiddleware).forRoutes(ProductController);
   }
 }

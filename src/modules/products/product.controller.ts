@@ -12,18 +12,20 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ResponseData } from '../../global/globalClass';
-import { HttpMessage } from '../../global/globalEnum';
-import { Product } from '../../models/product.model';
 import { ProductDto } from '../../modules/products/dto/product.dto';
 import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageService } from './image-upload.service';
+import {
+  GetProductResponse,
+  ProductResponse,
+} from 'shared/types/response.type';
 @UseGuards(AuthMiddleware)
-@Controller('products')
+@Controller('api/product')
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
@@ -32,79 +34,45 @@ export class ProductController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAllProduct(): Promise<ResponseData<Product>> {
-    try {
-      return new ResponseData<Product>(
-        await this.productService.getAllProduct(),
-        HttpStatus.OK,
-        HttpMessage.SUCCESS,
-      );
-    } catch (error) {
-      return new ResponseData<Product>(error, HttpStatus.OK, HttpMessage.ERROR);
-    }
+  async getAllProduct(): Promise<GetProductResponse> {
+    return this.productService.getAllProduct();
   }
 
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
-  async GetProductById(
-    @Param('id') id: number,
-  ): Promise<ResponseData<Product>> {
-    try {
-      return new ResponseData<Product>(
-        await this.productService.getProductId(id),
-        HttpStatus.OK,
-        HttpMessage.SUCCESS,
-      );
-    } catch (error) {
-      return new ResponseData<Product>(null, HttpStatus.OK, HttpMessage.ERROR);
-    }
+  async GetProductById(@Param('id') id: number): Promise<ProductResponse> {
+    return await this.productService.getProductId(id);
   }
 
-  @Post('create')
+  @Post('/create')
   @HttpCode(HttpStatus.OK)
+  @UsePipes(new ValidationPipe({ transform: true }))
   @UseInterceptors(FileInterceptor('image'))
   async createProduct(
     @UploadedFile() file: Express.Multer.File,
-    @Body(new ValidationPipe()) productDto: ProductDto,
-  ): Promise<ResponseData<Product>> {
+    @Body(new ValidationPipe()) body: ProductDto,
+  ): Promise<ProductResponse> {
     try {
       if (!file) {
         throw new NotFoundException(`Invalid Image`);
-      }
-      if (file) {
+      } else {
         const url = await this.imgService.uploadImage(file);
         const dataCopy = {
-          ...productDto,
+          ...body,
           urlImg: url,
           nameImg: file.originalname,
         };
-        return new ResponseData<Product>(
-          await this.productService.createProduct(dataCopy),
-          HttpStatus.OK,
-          HttpMessage.SUCCESS,
-        );
+        return this.productService.createProduct(dataCopy);
       }
     } catch (error) {
-      return new ResponseData<Product>(error, HttpStatus.OK, HttpMessage.ERROR);
+      throw error;
     }
   }
 
   @Delete('delete/:id')
   @HttpCode(HttpStatus.OK)
-  async DeleteProduct(@Param('id') id: number): Promise<ResponseData<Product>> {
-    try {
-      await this.productService.deleteProduct(id);
-      return new ResponseData<Product>(
-        null,
-        HttpStatus.OK,
-        HttpMessage.SUCCESS,
-      );
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
-      }
-      throw error;
-    }
+  async DeleteProduct(@Param('id') id: number): Promise<ProductResponse> {
+    return await this.productService.deleteProduct(id);
   }
 
   @Put('update/:id')
@@ -112,31 +80,16 @@ export class ProductController {
   @UseInterceptors(FileInterceptor('image'))
   async updateProduct(
     @Param('id') id: number,
-    @Body() updatedProduct: Partial<Product>,
+    @Body() body: Partial<ProductDto>,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ResponseData<Product>> {
-    try {
-      let data = null;
-      const product = await this.productService.getProductId(id);
-
-      if (product.nameImg !== file.originalname) {
-        const url = await this.imgService.uploadImage(file);
-
-        data = { ...updatedProduct, urlImg: url, nameImg: file.originalname };
-      } else {
-        data = { ...updatedProduct };
-      }
-      const updatedProductEntity = await this.productService.updateProduct(
-        id,
-        data,
-      );
-      return new ResponseData<Product>(
-        updatedProductEntity,
-        HttpStatus.OK,
-        HttpMessage.SUCCESS,
-      );
-    } catch (error) {
-      return new ResponseData<Product>(null, HttpStatus.OK, HttpMessage.ERROR);
+  ): Promise<ProductResponse> {
+    let data = {};
+    if (file) {
+      const url = await this.imgService.uploadImage(file);
+      data = { ...body, urlImg: url, nameImg: file.originalname };
+    } else {
+      data = { ...body };
     }
+    return await this.productService.updateProduct(id, data);
   }
 }
