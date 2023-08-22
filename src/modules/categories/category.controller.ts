@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Res,
   Param,
   Post,
   Body,
@@ -10,105 +9,55 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
+  UsePipes,
 } from '@nestjs/common';
-import { Response } from 'express';
-import { ResponseData } from '../../global/globalClass';
-import { HttpMessage } from '../../global/globalEnum';
 import { CategoryService } from './category.service';
 import { CategoryDto } from './dto/category.dto';
-import { Category } from '.../../models/category.model';
+import {
+  CategoryResponse,
+  GetAllCategoryResponse,
+} from 'shared/types/response.type';
+import { CreateCategoryGuards } from 'shared/guards/category.guard';
+import { Category } from 'models/category.model';
 
-@Controller('categories')
+@Controller('api/categories')
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async list(@Res() res: Response): Promise<any> {
-    try {
-      return res.json(
-        new ResponseData(
-          await this.categoryService.findAll(),
-          HttpStatus.OK,
-          HttpMessage.SUCCESS,
-        ),
-      );
-    } catch (error) {
-      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
-    }
+  async getAllCategory(): Promise<GetAllCategoryResponse> {
+    return await this.categoryService.findAll();
   }
 
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
-  async detail(@Param('id') id: number, @Res() res: Response): Promise<any> {
-    try {
-      return res.json(
-        new ResponseData(
-          await this.categoryService.findById(id),
-          HttpStatus.OK,
-          HttpMessage.SUCCESS,
-        ),
-      );
-    } catch (error) {
-      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
-    }
+  async detail(@Param('id') id: number): Promise<CategoryResponse> {
+    return await this.categoryService.findById(id);
   }
 
-  @Post()
+  @Post('/create')
   @HttpCode(HttpStatus.OK)
-  async create(
-    @Body(new ValidationPipe()) category: CategoryDto,
-    @Res() res: Response,
-  ): Promise<any> {
-    try {
-      return res.json(
-        new ResponseData(
-          await this.categoryService.create(category),
-          HttpStatus.OK,
-          HttpMessage.SUCCESS,
-        ),
-      );
-    } catch (error) {
-      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
-    }
+  @UseGuards(CreateCategoryGuards)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async create(@Body() body: CategoryDto): Promise<CategoryResponse> {
+    return this.categoryService.create(body);
   }
 
-  @Put('/:id')
+  @Put('update/:id')
   @HttpCode(HttpStatus.OK)
+  @UsePipes(new ValidationPipe({ transform: true }))
   async update(
     @Param('id') id: number,
-    @Body(new ValidationPipe()) category: CategoryDto,
-    @Res() res: Response,
-  ): Promise<any> {
-    try {
-      return res.json(
-        new ResponseData(
-          await this.categoryService.update(id, category),
-          HttpStatus.OK,
-          HttpMessage.SUCCESS,
-        ),
-      );
-    } catch (error) {
-      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
-    }
+    @Body() body: Partial<Category>,
+  ): Promise<CategoryResponse> {
+    return await this.categoryService.update(id, body);
   }
 
-  @Delete('/:id')
+  @Delete('/delete/:id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Param('id') id: number, @Res() res: Response): Promise<any> {
-    try {
-      const isFlag: boolean = await this.categoryService.delete(id);
-      if (isFlag) {
-        return res.json(
-          new ResponseData(isFlag, HttpStatus.OK, HttpMessage.SUCCESS),
-        );
-      } else {
-        return res.json(
-          new ResponseData(isFlag, HttpStatus.OK, HttpMessage.ERROR),
-        );
-      }
-    } catch (error) {
-      return res.json(new ResponseData(null, HttpStatus.OK, HttpMessage.ERROR));
-    }
+  async delete(@Param('id') id: number): Promise<CategoryResponse> {
+    return await this.categoryService.delete(id);
   }
 }

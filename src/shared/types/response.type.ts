@@ -64,3 +64,23 @@ export type GetProductResponse = {
   result: ProductType[];
   message: string;
 };
+
+export type CategoryResponse = {
+  result?: {
+    id: number;
+    categoryName: string;
+    description: string;
+  };
+  message: string;
+};
+
+export type CategoryType = {
+  id: number;
+  categoryName: string;
+  description: string;
+};
+
+export type GetAllCategoryResponse = {
+  result: CategoryType[];
+  message: string;
+};
