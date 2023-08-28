@@ -84,3 +84,27 @@ export type GetAllCategoryResponse = {
   result: CategoryType[];
   message: string;
 };
+
+export type OrderScheduleResponse = {
+  result?: {
+    id: number;
+    name: string;
+    email: string;
+    phone: number;
+    dateSchedule: Date;
+  };
+  message: string;
+};
+
+export type OrderScheduleType = {
+  id: number;
+  name: string;
+  email: string;
+  phone: number;
+  dateSchedule: Date;
+};
+
+export type GetAllOrderResponse = {
+  result: OrderScheduleType[];
+  message: string;
+};

@@ -4,6 +4,10 @@ import { Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
 import { OrderCutDto } from './dto/orderCut.dto';
 import { OrderCutEntity } from '../../entities/orderCut.entity';
+import {
+  GetAllOrderResponse,
+  OrderScheduleResponse,
+} from 'shared/types/response.type';
 
 @Injectable()
 export class OrderService {
@@ -22,9 +26,9 @@ export class OrderService {
     });
   }
 
-  async getAllOrder() {
+  async getAllOrder(): Promise<GetAllOrderResponse> {
     const order = await this.orderRepository.find();
-    return order;
+    return { result: order, message: 'Get All Order schedule success !' };
   }
 
   async checkDuplicateDate(requestDate: Date) {
@@ -40,25 +44,22 @@ export class OrderService {
     }
   }
 
-  async createOrder(data: OrderCutDto): Promise<OrderCutEntity> {
+  async createOrder(data: OrderCutDto): Promise<OrderScheduleResponse> {
     const currentDate = new Date();
     const requestDate = new Date(data.dateSchedule);
     const ExitDuplicateOrder = await this.checkDuplicateDate(requestDate);
 
     if (ExitDuplicateOrder) {
-      throw new Error('Ngày bị trùng!');
+      throw new Error('Duplicate Date!');
     }
 
     if (requestDate < currentDate) {
-      throw new Error('Không thể tạo đơn hàng cho ngày tháng năm quá khứ.');
+      throw new Error('You can not create when you chose past date !');
     }
 
-    try {
-      await this.sendMail(data);
-      return await this.orderRepository.save(data);
-    } catch (error) {
-      console.log(error);
-    }
+    await this.sendMail(data);
+    const result = await this.orderRepository.save(data);
+    return { result: result, message: 'Create Order schedule success!' };
   }
 
   async sendMail(data: OrderCutDto): Promise<void> {
