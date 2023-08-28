@@ -5,13 +5,15 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  UseGuards,
+  UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { HttpMessage } from '../../global/globalEnum';
-import { OrderModel } from '../../models/order.model';
 import { OrderCutDto } from './dto/orderCut.dto';
-import { ResponseData } from '../../global/globalClass';
+import { GetAllOrderResponse } from 'shared/types/response.type';
+import { OrderScheduleResponse } from '../../shared/types/response.type';
+import { CreateOrderGuard } from 'shared/guards/order.guard';
 
 @Controller('order')
 export class OrderController {
@@ -19,43 +21,15 @@ export class OrderController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAllOrder(): Promise<ResponseData<OrderModel>> {
-    try {
-      return new ResponseData<OrderModel>(
-        await this.orderService.getAllOrder(),
-        HttpStatus.OK,
-        HttpMessage.SUCCESS,
-      );
-    } catch (error) {
-      console.log(error);
-
-      return new ResponseData<OrderModel>(
-        null,
-        HttpStatus.UNAUTHORIZED,
-        HttpMessage.ERROR,
-      );
-    }
+  async getAllOrder(): Promise<GetAllOrderResponse> {
+    return this.orderService.getAllOrder();
   }
 
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  async CreateOrder(
-    @Body(new ValidationPipe()) orderCreate: OrderCutDto,
-  ): Promise<ResponseData<OrderModel>> {
-    try {
-      return new ResponseData<OrderModel>(
-        await this.orderService.createOrder(orderCreate),
-        HttpStatus.OK,
-        HttpMessage.SUCCESS,
-      );
-    } catch (error) {
-      console.log(error);
-
-      return new ResponseData<OrderModel>(
-        null,
-        HttpStatus.OK,
-        HttpMessage.ERROR,
-      );
-    }
+  @UseGuards(CreateOrderGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async CreateOrder(@Body() body: OrderCutDto): Promise<OrderScheduleResponse> {
+    return this.orderService.createOrder(body);
   }
 }
