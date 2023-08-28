@@ -21,7 +21,7 @@ export class OrderController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAllOrder(): Promise<GetAllOrderResponse> {
+  getAllOrder(): Promise<GetAllOrderResponse> {
     return this.orderService.getAllOrder();
   }
 
@@ -29,7 +29,7 @@ export class OrderController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(CreateOrderGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
-  async CreateOrder(@Body() body: OrderCutDto): Promise<OrderScheduleResponse> {
+  CreateOrder(@Body() body: OrderCutDto): Promise<OrderScheduleResponse> {
     return this.orderService.createOrder(body);
   }
 }
