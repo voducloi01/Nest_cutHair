@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { v4 as uuidv4 } from 'uuid';
@@ -29,7 +29,7 @@ export class ImageService implements MulterOptionsFactory {
   async uploadImage(file: Express.Multer.File): Promise<string> {
     try {
       if (!file) {
-        throw new NotFoundException(`Invalid Image`);
+        throw new BadRequestException(`Invalid Image`);
       }
       const result = await cloudinary.uploader.upload(file.path);
       const publicUrl = result.secure_url;
