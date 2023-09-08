@@ -8,12 +8,14 @@ import {
   ProductResponse,
   ProductType,
 } from 'shared/types/response.type';
+import { ImageService } from './image-upload.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
+    private readonly imgService: ImageService,
   ) {}
 
   async getAllProduct(): Promise<GetProductResponse> {
@@ -53,8 +55,17 @@ export class ProductService {
     };
   }
 
-  async createProduct(data: Product): Promise<ProductResponse> {
-    const product = await this.productRepository.save(data);
+  async createProduct(
+    data: Product,
+    file: Express.Multer.File,
+  ): Promise<ProductResponse> {
+    const url = await this.imgService.uploadImage(file);
+    const dataCopy = {
+      ...data,
+      urlImg: url,
+      nameImg: file.originalname,
+    };
+    const product = await this.productRepository.save(dataCopy);
     return {
       result: {
         id: product.id,
@@ -77,11 +88,19 @@ export class ProductService {
   async updateProduct(
     productId: number,
     updatedProduct: Partial<Product>,
+    file: Express.Multer.File,
   ): Promise<ProductResponse> {
+    let data = {};
+    if (file) {
+      const url = await this.imgService.uploadImage(file);
+      data = { ...updatedProduct, urlImg: url, nameImg: file.originalname };
+    } else {
+      data = { ...updatedProduct };
+    }
     const { result } = await this.getProductId(productId);
     const product = await this.productRepository.save({
       ...result,
-      ...updatedProduct,
+      ...data,
     });
 
     return {

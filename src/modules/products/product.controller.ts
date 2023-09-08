@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -34,62 +33,41 @@ export class ProductController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getAllProduct(): Promise<GetProductResponse> {
+  getAllProduct(): Promise<GetProductResponse> {
     return this.productService.getAllProduct();
   }
 
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
-  async GetProductById(@Param('id') id: number): Promise<ProductResponse> {
-    return await this.productService.getProductId(id);
+  GetProductById(@Param('id') id: number): Promise<ProductResponse> {
+    return this.productService.getProductId(id);
   }
 
   @Post('/create')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ transform: true }))
   @UseInterceptors(FileInterceptor('image'))
-  async createProduct(
+  createProduct(
     @UploadedFile() file: Express.Multer.File,
     @Body(new ValidationPipe()) body: ProductDto,
   ): Promise<ProductResponse> {
-    try {
-      if (!file) {
-        throw new NotFoundException(`Invalid Image`);
-      } else {
-        const url = await this.imgService.uploadImage(file);
-        const dataCopy = {
-          ...body,
-          urlImg: url,
-          nameImg: file.originalname,
-        };
-        return this.productService.createProduct(dataCopy);
-      }
-    } catch (error) {
-      throw error;
-    }
+    return this.productService.createProduct(body, file);
   }
 
   @Delete('delete/:id')
   @HttpCode(HttpStatus.OK)
-  async DeleteProduct(@Param('id') id: number): Promise<ProductResponse> {
-    return await this.productService.deleteProduct(id);
+  DeleteProduct(@Param('id') id: number): Promise<ProductResponse> {
+    return this.productService.deleteProduct(id);
   }
 
   @Put('update/:id')
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('image'))
-  async updateProduct(
+  updateProduct(
     @Param('id') id: number,
     @Body() body: Partial<ProductDto>,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ProductResponse> {
-    let data = {};
-    if (file) {
-      const url = await this.imgService.uploadImage(file);
-      data = { ...body, urlImg: url, nameImg: file.originalname };
-    } else {
-      data = { ...body };
-    }
-    return await this.productService.updateProduct(id, data);
+    return this.productService.updateProduct(id, body, file);
   }
 }
