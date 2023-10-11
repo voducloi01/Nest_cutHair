@@ -74,9 +74,9 @@ export class AuthController {
   @UseGuards(AuthMiddleware)
   async updateUser(
     @Param('id') id: number,
-    @Body(new ValidationPipe()) params: UserDto,
+    @Body() body: Partial<UserDto>,
   ): Promise<UpdateUser> {
-    return this.userService.updateUser(id, params);
+    return this.userService.updateUser(id, body);
   }
 
   @Delete('api/delete-user/:id')
