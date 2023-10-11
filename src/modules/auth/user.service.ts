@@ -100,7 +100,7 @@ export class UserService {
     };
   }
 
-  async updateUser(id: number, params: UserDto): Promise<UpdateUser> {
+  async updateUser(id: number, params: Partial<UserDto>): Promise<UpdateUser> {
     const user = await this.userRepository.findOneBy({ id: id });
 
     if (!user) {
@@ -108,7 +108,10 @@ export class UserService {
     }
 
     if (params.role) {
-      if (params.role !== ROLE.Admin && params.role !== ROLE.Staff) {
+      if (
+        Number(params.role) !== ROLE.Admin &&
+        Number(params.role) !== ROLE.Staff
+      ) {
         throw new BadRequestException('Role already exits !');
       }
     }
@@ -123,6 +126,7 @@ export class UserService {
       email: params.email,
       role: params.role,
     };
+    console.log(newUser);
 
     return { result: newUser, message: 'Update successfully' };
   }
