@@ -18,7 +18,6 @@ import { ProductService } from './product.service';
 import { ProductDto } from '../../modules/products/dto/product.dto';
 import { AuthMiddleware } from '../../shared/middlewares/auth.midleware';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageService } from './image-upload.service';
 import {
   GetProductResponse,
   ProductResponse,
@@ -26,10 +25,7 @@ import {
 @UseGuards(AuthMiddleware)
 @Controller('api/product')
 export class ProductController {
-  constructor(
-    private readonly productService: ProductService,
-    private readonly imgService: ImageService,
-  ) {}
+  constructor(private readonly productService: ProductService) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
