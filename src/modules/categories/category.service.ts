@@ -17,14 +17,14 @@ export class CategoryService {
   ) {}
 
   async findAll(): Promise<GetAllCategoryResponse> {
-    const category = await this.categoryRepository.find();
-    const categoryCopy: CategoryType[] = category.map((e) => ({
-      id: e.id,
-      categoryName: e.categoryName,
-      description: e.description,
-    }));
+    const categoryAll = await this.categoryRepository.find({
+      relations: {
+        products: true,
+      },
+    });
+
     return {
-      result: categoryCopy,
+      result: categoryAll,
       message: 'Get All Category!',
     };
   }

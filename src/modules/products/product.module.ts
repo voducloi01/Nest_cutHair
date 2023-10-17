@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { ProductEntity } from '../../entities/product.entity';
@@ -24,6 +29,12 @@ import { JwtModule } from '@nestjs/jwt';
 })
 export class ProductModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(ProductController);
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(
+        { path: 'api/product/create', method: RequestMethod.POST },
+        { path: 'api/product/delete/:id', method: RequestMethod.DELETE },
+        { path: 'api/product/update/:id', method: RequestMethod.PUT },
+      );
   }
 }

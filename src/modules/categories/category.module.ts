@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoryController } from './category.controller';
 import { CategoryService } from './category.service';
@@ -19,6 +24,19 @@ import { JwtModule } from '@nestjs/jwt';
 })
 export class CategoryModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(CategoryController);
+    consumer.apply(AuthMiddleware).forRoutes(
+      {
+        path: 'api/categories/create',
+        method: RequestMethod.POST,
+      },
+      {
+        path: 'api/categories/update/:id',
+        method: RequestMethod.PUT,
+      },
+      {
+        path: 'api/categories/delete/:id',
+        method: RequestMethod.DELETE,
+      },
+    );
   }
 }
