@@ -15,7 +15,7 @@ import { GetAllOrderResponse } from 'shared/types/response.type';
 import { OrderScheduleResponse } from '../../shared/types/response.type';
 import { CreateOrderGuard } from 'shared/guards/order.guard';
 
-@Controller('order')
+@Controller('api/order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 

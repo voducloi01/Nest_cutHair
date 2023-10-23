@@ -11,8 +11,6 @@ export class OrderCutDto {
   email: string;
 
   @IsNotEmpty()
-  @MinLength(10)
-  @MaxLength(15)
   phone: number;
 
   @IsNotEmpty()

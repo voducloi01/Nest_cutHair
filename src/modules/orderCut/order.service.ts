@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
@@ -8,6 +8,7 @@ import {
   GetAllOrderResponse,
   OrderScheduleResponse,
 } from 'shared/types/response.type';
+import moment from 'moment';
 
 @Injectable()
 export class OrderService {
@@ -50,15 +51,18 @@ export class OrderService {
     const ExitDuplicateOrder = await this.checkDuplicateDate(requestDate);
 
     if (ExitDuplicateOrder) {
-      throw new Error('Duplicate Date!');
+      throw new BadRequestException('Duplicate Date!');
     }
 
     if (requestDate < currentDate) {
-      throw new Error('You can not create when you chose past date !');
+      throw new BadRequestException(
+        'You can not create when you chose past date !',
+      );
     }
 
-    await this.sendMail(data);
     const result = await this.orderRepository.save(data);
+    await this.sendMail(data);
+
     return { result: result, message: 'Create Order schedule success!' };
   }
 
@@ -69,7 +73,9 @@ export class OrderService {
         from: 'ducloi.hutech@gmail.com',
         subject: 'Đơn đặt',
         text: 'Well come',
-        html: `<b>Đơn đặt lich ngày ${data.dateSchedule} của bạn thành công !</b>`,
+        html: `<b>Đơn đặt lich ngày ${moment(data.dateSchedule).format(
+          'DD/MM/YY HH:MM',
+        )} của bạn thành công !</b>`,
       });
     } catch (err) {
       console.error(err);
