@@ -90,7 +90,7 @@ export type OrderScheduleResponse = {
     id: number;
     name: string;
     email: string;
-    phone: number;
+    phone: string;
     dateSchedule: Date;
   };
   message: string;
@@ -100,7 +100,7 @@ export type OrderScheduleType = {
   id: number;
   name: string;
   email: string;
-  phone: number;
+  phone: string;
   dateSchedule: Date;
 };
 

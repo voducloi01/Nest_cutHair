@@ -11,7 +11,7 @@ export class OrderCutDto {
   email: string;
 
   @IsNotEmpty()
-  phone: number;
+  phone: string;
 
   @IsNotEmpty()
   dateSchedule: Date;
