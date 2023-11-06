@@ -12,7 +12,7 @@ export class OrderCutEntity extends BaseEntity {
   email: string;
 
   @Column()
-  phone: number;
+  phone: string;
 
   @Column({ type: 'datetime' })
   dateSchedule: Date;
